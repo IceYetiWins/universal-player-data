@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "universal-player-data",
+  "version": "${version}",
+  "name": "universal-player-data",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/universal-player-data/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.iceyetiwins.universalPlayerData.client.UniversalPlayerDataClient"
+    ],
+    "main": [
+      "com.iceyetiwins.universalPlayerData.UniversalPlayerData"
+    ]
+  },
+  "mixins": [
+    "universal-player-data.mixins.json",
+    {
+      "config": "universal-player-data.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
