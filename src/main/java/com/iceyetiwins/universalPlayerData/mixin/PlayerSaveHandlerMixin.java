@@ -56,18 +56,16 @@ public class PlayerSaveHandlerMixin {
 
     @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
     private void loadPlayerData(PlayerEntity player, String extension, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
-        File customDir = UNIVERSAL_PLAYER_DATA_DIR.toFile();
-        String uuid = player.getUuidAsString();
-        File file = new File(customDir, uuid + extension);
+        File var10002 = UNIVERSAL_PLAYER_DATA_DIR.toFile();
+        String var10003 = player.getUuidAsString();
+        File file = new File(var10002, var10003 + extension);
 
         if (file.exists() && file.isFile()) {
             try {
-                Optional<NbtCompound> data = Optional.of(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes()));
-                cir.setReturnValue(data);
-            } catch (Exception e) {
+                cir.setReturnValue(Optional.of(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
+            } catch (Exception var5) {
                 LOGGER.warn("Failed to load player data for {}", player.getName().getString());
             }
         }
     }
-
 }
