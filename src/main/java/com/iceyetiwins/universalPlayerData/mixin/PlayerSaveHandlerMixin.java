@@ -3,6 +3,9 @@ package com.iceyetiwins.universalPlayerData.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.util.Util;
 import net.minecraft.world.PlayerSaveHandler;
 import org.slf4j.Logger;
@@ -11,9 +14,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Optional;
 
 @Mixin(PlayerSaveHandler.class)
 public class PlayerSaveHandlerMixin {
@@ -29,7 +35,7 @@ public class PlayerSaveHandlerMixin {
                     shift = At.Shift.BEFORE
             )
     )
-    public void onSavePlayerData(PlayerEntity player, CallbackInfo ci, @Local(ordinal = 1) Path path2) { //first local variable of type Path
+    private void onSavePlayerData(PlayerEntity player, CallbackInfo ci, @Local(ordinal = 1) Path path2) { //first local variable of type Path
         try {
             Files.createDirectories(UNIVERSAL_PLAYER_DATA_DIR);
 
@@ -47,4 +53,21 @@ public class PlayerSaveHandlerMixin {
             LOGGER.error("Failed to save universal player data for {}", player.getName().getString(), e);
         }
     }
+
+    @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
+    private void loadPlayerData(PlayerEntity player, String extension, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
+        File customDir = UNIVERSAL_PLAYER_DATA_DIR.toFile();
+        String uuid = player.getUuidAsString();
+        File file = new File(customDir, uuid + extension);
+
+        if (file.exists() && file.isFile()) {
+            try {
+                Optional<NbtCompound> data = Optional.of(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes()));
+                cir.setReturnValue(data);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to load player data for {}", player.getName().getString());
+            }
+        }
+    }
+
 }
