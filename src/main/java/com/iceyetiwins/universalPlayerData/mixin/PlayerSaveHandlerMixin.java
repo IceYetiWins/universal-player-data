@@ -70,25 +70,59 @@ public class PlayerSaveHandlerMixin {
                 NbtCompound worldNbt = NbtIo.readCompressed(worldPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
                 NbtCompound universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
 
-                if (worldNbt.contains("SpawnX") && worldNbt.contains("SpawnY") && worldNbt.contains("SpawnZ")) {
-                    int spawnX = worldNbt.getInt("SpawnX");
-                    int spawnY = worldNbt.getInt("SpawnY");
-                    int spawnZ = worldNbt.getInt("SpawnZ");
-
-                    universalNbt.putInt("SpawnX", spawnX);
-                    universalNbt.putInt("SpawnY", spawnY);
-                    universalNbt.putInt("SpawnZ", spawnZ);
-
-                    NbtIo.writeCompressed(universalNbt, universalPlayerData.toPath());
-
-                    cir.setReturnValue(Optional.of(universalNbt));
+                if (worldNbt.contains("Abilities")) {
+                    universalNbt.remove("Abilities");
+                    universalNbt.put("Abilities", worldNbt.getCompound("Abilities"));
+                } else {
+                    universalNbt.remove("Abilities");
                 }
+
+                if (worldNbt.contains("LastDeathLocation")) {
+                    universalNbt.put("LastDeathLocation", worldNbt.getCompound("LastDeathLocation"));
+                } else {
+                    universalNbt.remove("LastDeathLocation");
+                }
+
+                if (worldNbt.contains("SpawnX") && worldNbt.contains("SpawnY") && worldNbt.contains("SpawnZ")) {
+                    universalNbt.putInt("SpawnX", worldNbt.getInt("SpawnX"));
+                    universalNbt.putInt("SpawnY", worldNbt.getInt("SpawnY"));
+                    universalNbt.putInt("SpawnZ", worldNbt.getInt("SpawnZ"));
+                } else {
+                    universalNbt.remove("SpawnX");
+                    universalNbt.remove("SpawnY");
+                    universalNbt.remove("SpawnZ");
+                }
+
+                if (worldNbt.contains("playerGameType")) {
+                    universalNbt.remove("playerGameType");
+                    universalNbt.put("playerGameType", worldNbt.getCompound("playerGameType"));
+                } else {
+                    universalNbt.remove("playerGameType");
+                }
+
+                if (worldNbt.contains("warden_spawn_tracker")) {
+                    universalNbt.put("warden_spawn_tracker", worldNbt.getCompound("warden_spawn_tracker"));
+                } else {
+                    universalNbt.remove("warden_spawn_tracker");
+                }
+
+                NbtIo.writeCompressed(universalNbt, universalPlayerData.toPath());
+                cir.setReturnValue(Optional.of(universalNbt));
             } catch (Exception e) {
                 LOGGER.warn("Failed to load or modify player data for {}", player.getName().getString(), e);
             }
         } else if (universalPlayerData.exists() && universalPlayerData.isFile()){
             try {
-                cir.setReturnValue(Optional.of(NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
+                NbtCompound universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                universalNbt.remove("Abilities");
+                universalNbt.remove("LastDeathLocation");
+                universalNbt.remove("SpawnX");
+                universalNbt.remove("SpawnY");
+                universalNbt.remove("SpawnZ");
+                universalNbt.remove("playerGameType");
+                universalNbt.remove("warden_spawn_tracker");
+
+                cir.setReturnValue(Optional.of(universalNbt));
             } catch (Exception e) {
                 LOGGER.warn("Failed to load or modify player data for {}", player.getName().getString(), e);
             }
