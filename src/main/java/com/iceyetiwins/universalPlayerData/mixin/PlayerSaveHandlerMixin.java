@@ -28,37 +28,32 @@ public class PlayerSaveHandlerMixin {
     private static final Path UNIVERSAL_PLAYER_DATA_DIR = FabricLoader.getInstance().getGameDir().resolve("universal-playerdata");
     private static final Logger LOGGER = LoggerFactory.getLogger("universalPlayerData");
 
-    //right before Util.backupAndReplace in savePlayerData()
-    @Inject(
-            method = "savePlayerData",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/Util;backupAndReplace(Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/nio/file/Path;)V", //finds net.minecraft.util.Util.backupAndReplace(Path, Path, Path)
-                    shift = At.Shift.BEFORE
-            )
-    )
-    private void onSavePlayerData(PlayerEntity player, CallbackInfo ci, @Local(ordinal = 1) Path path2) { //first local variable of type Path
-        try {
-            Files.createDirectories(UNIVERSAL_PLAYER_DATA_DIR);
-
-            // temporary deep copy of path2
-            Path path2Copy = Files.createTempFile(player.getUuidAsString() + "-", ".dat");
-            Files.copy(path2, path2Copy, StandardCopyOption.REPLACE_EXISTING);
-
-            Path path3 = UNIVERSAL_PLAYER_DATA_DIR.resolve(player.getUuidAsString() + ".dat");
-            Path path4 = UNIVERSAL_PLAYER_DATA_DIR.resolve(player.getUuidAsString() + ".dat_old");
-
-            Util.backupAndReplace(path3, path2Copy, path4);
-
-            Files.deleteIfExists(path2Copy);
-        } catch (IOException e) {
-            LOGGER.error("Failed to save universal player data for {}", player.getName().getString(), e);
-        }
-    }
-
     @Final
     @Shadow
     private File playerDataDir;
+
+    @Inject(method = "savePlayerData", at = @At("TAIL"))
+    private void onSavePlayerData(PlayerEntity player, CallbackInfo ci){
+        try {
+            Files.createDirectories(UNIVERSAL_PLAYER_DATA_DIR);
+
+            File worldPlayerData = new File(playerDataDir, player.getUuidAsString() + ".dat");
+            File worldPlayerDataBackup = new File(playerDataDir, player.getUuidAsString() + ".dat_old");
+            File universalPlayerData = new File(UNIVERSAL_PLAYER_DATA_DIR.toFile(), player.getUuidAsString() + ".dat");
+            File universalPlayerDataBackup = new File(UNIVERSAL_PLAYER_DATA_DIR.toFile(), player.getUuidAsString() + ".dat_old");
+
+            if (worldPlayerData.exists() && worldPlayerData.isFile()){
+                Files.copy(worldPlayerData.toPath(), universalPlayerData.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            if (worldPlayerDataBackup.exists() && worldPlayerDataBackup.isFile()){
+                Files.copy(worldPlayerData.toPath(), universalPlayerDataBackup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to save universal player data for {}", player.getName().getString(), e);
+        }
+
+    }
 
     @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
     private void loadPlayerData(PlayerEntity player, String extension, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
