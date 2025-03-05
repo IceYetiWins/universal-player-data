@@ -86,6 +86,12 @@ public class PlayerSaveHandlerMixin {
             } catch (Exception e) {
                 LOGGER.warn("Failed to load or modify player data for {}", player.getName().getString(), e);
             }
+        } else if (universalPlayerData.exists() && universalPlayerData.isFile()){
+            try {
+                cir.setReturnValue(Optional.of(NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
+            } catch (Exception e) {
+                LOGGER.warn("Failed to load or modify player data for {}", player.getName().getString(), e);
+            }
         }
     }
 }
