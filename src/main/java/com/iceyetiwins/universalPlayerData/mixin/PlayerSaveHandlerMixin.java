@@ -56,9 +56,7 @@ public class PlayerSaveHandlerMixin {
 
     @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
     private void loadPlayerData(PlayerEntity player, String extension, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
-        File var10002 = UNIVERSAL_PLAYER_DATA_DIR.toFile();
-        String var10003 = player.getUuidAsString();
-        File file = new File(var10002, var10003 + extension);
+        File file = new File(UNIVERSAL_PLAYER_DATA_DIR.toFile(), player.getUuidAsString() + extension);
 
         if (file.exists() && file.isFile()) {
             try {
