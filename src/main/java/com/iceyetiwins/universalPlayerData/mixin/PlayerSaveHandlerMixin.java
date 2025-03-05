@@ -10,7 +10,9 @@ import net.minecraft.util.Util;
 import net.minecraft.world.PlayerSaveHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -54,15 +56,35 @@ public class PlayerSaveHandlerMixin {
         }
     }
 
+    @Final
+    @Shadow
+    private File playerDataDir;
+
     @Inject(method = "loadPlayerData", at = @At("HEAD"), cancellable = true)
     private void loadPlayerData(PlayerEntity player, String extension, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
-        File file = new File(UNIVERSAL_PLAYER_DATA_DIR.toFile(), player.getUuidAsString() + extension);
+        File worldPlayerData = new File(playerDataDir, player.getUuidAsString() + extension);
+        File universalPlayerData = new File(UNIVERSAL_PLAYER_DATA_DIR.toFile(), player.getUuidAsString() + extension);
 
-        if (file.exists() && file.isFile()) {
+        if (worldPlayerData.exists() && worldPlayerData.isFile() && universalPlayerData.exists() && universalPlayerData.isFile()) {
             try {
-                cir.setReturnValue(Optional.of(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
-            } catch (Exception var5) {
-                LOGGER.warn("Failed to load player data for {}", player.getName().getString());
+                NbtCompound worldNbt = NbtIo.readCompressed(worldPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                NbtCompound universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+
+                if (worldNbt.contains("SpawnX") && worldNbt.contains("SpawnY") && worldNbt.contains("SpawnZ")) {
+                    int spawnX = worldNbt.getInt("SpawnX");
+                    int spawnY = worldNbt.getInt("SpawnY");
+                    int spawnZ = worldNbt.getInt("SpawnZ");
+
+                    universalNbt.putInt("SpawnX", spawnX);
+                    universalNbt.putInt("SpawnY", spawnY);
+                    universalNbt.putInt("SpawnZ", spawnZ);
+
+                    NbtIo.writeCompressed(universalNbt, universalPlayerData.toPath());
+
+                    cir.setReturnValue(Optional.of(universalNbt));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Failed to load or modify player data for {}", player.getName().getString(), e);
             }
         }
     }
