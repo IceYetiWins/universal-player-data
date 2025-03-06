@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "universal-player-data",
   "version": "${version}",
-  "name": "universal-player-data",
+  "name": "Universal Player Data",
   "description": "",
   "authors": ["Ice Yeti"],
   "contact": {
