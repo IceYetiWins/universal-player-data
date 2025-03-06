@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class UniversalPlayerData implements ModInitializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("universalPlayerData");
+    private static final Logger LOGGER = LoggerFactory.getLogger("Minecraft");
 
     @Override
     public void onInitialize() {

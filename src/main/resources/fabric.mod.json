@@ -4,8 +4,12 @@
   "version": "${version}",
   "name": "universal-player-data",
   "description": "",
-  "authors": [],
-  "contact": {},
+  "authors": ["Ice Yeti"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/universal-player-data",
+    "sources": "https://github.com/IceYetiWins/universal-player-data",
+    "issues": "https://github.com/IceYetiWins/universal-player-data/issues"
+  },
   "license": "MIT",
   "icon": "assets/universal-player-data/icon.png",
   "environment": "*",
