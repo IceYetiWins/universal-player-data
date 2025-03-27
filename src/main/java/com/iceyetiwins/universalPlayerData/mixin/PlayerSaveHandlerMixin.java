@@ -1,12 +1,10 @@
 package com.iceyetiwins.universalPlayerData.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.util.Util;
 import net.minecraft.world.PlayerSaveHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,36 +65,33 @@ public class PlayerSaveHandlerMixin {
 
                 if (worldNbt.contains("Abilities")) {
                     universalNbt.remove("Abilities");
-                    universalNbt.put("Abilities", worldNbt.getCompound("Abilities"));
+                    universalNbt.put("Abilities", worldNbt.get("Abilities"));
                 } else {
                     universalNbt.remove("Abilities");
                 }
 
                 if (worldNbt.contains("LastDeathLocation")) {
-                    universalNbt.put("LastDeathLocation", worldNbt.getCompound("LastDeathLocation"));
+                    universalNbt.put("LastDeathLocation", worldNbt.get("LastDeathLocation"));
                 } else {
                     universalNbt.remove("LastDeathLocation");
                 }
 
-                if (worldNbt.contains("SpawnX") && worldNbt.contains("SpawnY") && worldNbt.contains("SpawnZ")) {
-                    universalNbt.putInt("SpawnX", worldNbt.getInt("SpawnX"));
-                    universalNbt.putInt("SpawnY", worldNbt.getInt("SpawnY"));
-                    universalNbt.putInt("SpawnZ", worldNbt.getInt("SpawnZ"));
-                } else {
-                    universalNbt.remove("SpawnX");
-                    universalNbt.remove("SpawnY");
-                    universalNbt.remove("SpawnZ");
-                }
-
                 if (worldNbt.contains("playerGameType")) {
                     universalNbt.remove("playerGameType");
-                    universalNbt.put("playerGameType", worldNbt.getCompound("playerGameType"));
+                    universalNbt.put("playerGameType", worldNbt.get("playerGameType"));
                 } else {
                     universalNbt.remove("playerGameType");
+                }
+
+                if (worldNbt.contains("respawn")){
+                    universalNbt.remove("respawn");
+                    universalNbt.put("respawn", worldNbt.get("respawn"));
+                } else {
+                    universalNbt.remove("respawn");
                 }
 
                 if (worldNbt.contains("warden_spawn_tracker")) {
-                    universalNbt.put("warden_spawn_tracker", worldNbt.getCompound("warden_spawn_tracker"));
+                    universalNbt.put("warden_spawn_tracker", worldNbt.get("warden_spawn_tracker"));
                 } else {
                     universalNbt.remove("warden_spawn_tracker");
                 }
@@ -111,10 +106,8 @@ public class PlayerSaveHandlerMixin {
                 NbtCompound universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtSizeTracker.ofUnlimitedBytes());
                 universalNbt.remove("Abilities");
                 universalNbt.remove("LastDeathLocation");
-                universalNbt.remove("SpawnX");
-                universalNbt.remove("SpawnY");
-                universalNbt.remove("SpawnZ");
                 universalNbt.remove("playerGameType");
+                universalNbt.remove("respawn");
                 universalNbt.remove("warden_spawn_tracker");
 
                 cir.setReturnValue(Optional.of(universalNbt));
