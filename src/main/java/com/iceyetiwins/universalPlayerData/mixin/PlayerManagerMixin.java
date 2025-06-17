@@ -1,8 +1,9 @@
 package com.iceyetiwins.universalPlayerData.mixin;
 
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.world.PlayerSaveHandler;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,11 +18,11 @@ import java.util.Optional;
 public abstract class PlayerManagerMixin {
     //don't use level.dat save
     @Inject(method = "loadPlayerData", at = @At("RETURN"), cancellable = true)
-    private void forceElseCondition(ServerPlayerEntity player, CallbackInfoReturnable<Optional<NbtCompound>> cir) {
+    private void forceElseCondition(ServerPlayerEntity player, ErrorReporter errorReporter, CallbackInfoReturnable<Optional<ReadView>> cir) {
         if (cir.getReturnValue().isPresent()) {
             PlayerSaveHandler saveHandler = ((PlayerManagerAccessor) this).getSaveHandler();
 
-            Optional<NbtCompound> optional = saveHandler.loadPlayerData(player);
+            Optional<ReadView> optional = saveHandler.loadPlayerData(player, errorReporter);
 
             cir.setReturnValue(optional);
         }
@@ -42,5 +43,3 @@ public abstract class PlayerManagerMixin {
         logger.info("{}[{}] logged in with entity id {}", playerName, playerIp, playerId); //remove location from log because it will differ depending on spawn point
     }
 }
-
-
