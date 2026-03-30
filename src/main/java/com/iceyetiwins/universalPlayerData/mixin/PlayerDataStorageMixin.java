@@ -83,6 +83,8 @@ public class PlayerDataStorageMixin {
                     }
 
                     cir.setReturnValue(Optional.of(universalNbt));
+                } else if (worldPlayerData.exists() && worldPlayerData.isFile()) {
+                    cir.setReturnValue(Optional.of(NbtIo.readCompressed(worldPlayerData.toPath(), NbtAccounter.unlimitedHeap())));
                 }
 
             } catch (Exception e) {
