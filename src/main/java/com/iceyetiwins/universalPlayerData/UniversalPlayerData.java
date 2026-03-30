@@ -1,24 +1,25 @@
 package com.iceyetiwins.universalPlayerData;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.TeleportTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UniversalPlayerData implements ModInitializer {
+    public static final String MOD_ID = "universal-player-data-2";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Minecraft");
+    // This logger is used to write text to the console and the log file.
+    // It is considered best practice to use your mod id as the logger's name.
+    // That way, it's clear which mod wrote info, warnings, and errors.
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+    public static final String[] NBT_TAGS = {"abilities", "LastDeathLocation", "playerGameType", "respawn", "warden_spawn_tracker"};
 
     @Override
     public void onInitialize() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity player = handler.getPlayer();
+        // This code runs as soon as Minecraft is in a mod-load-ready state.
+        // However, some things (like resources) may still be uninitialized.
+        // Proceed with mild caution.
 
-            player.teleportTo(player.getRespawnTarget(true, TeleportTarget.NO_OP));
-
-            LOGGER.info("{} logged in at ({}, {}, {})", player.getName().getString(), player.getX(), player.getY(), player.getZ());
-        });
+        LOGGER.info("this work?");
     }
 }
