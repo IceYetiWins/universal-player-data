@@ -3,7 +3,7 @@
   "id": "universal-player-data",
   "version": "${version}",
   "name": "Universal Player Data",
-  "description": "",
+  "description": "Player data is shared between all worlds.",
   "authors": ["Ice Yeti"],
   "contact": {
     "homepage": "https://modrinth.com/mod/universal-player-data",
@@ -19,6 +19,9 @@
     ],
     "main": [
       "com.iceyetiwins.universalPlayerData.UniversalPlayerData"
+    ],
+    "modmenu": [
+      "com.iceyetiwins.universalPlayerData.client.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -31,6 +34,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "${minecraft_version}",
+    "yet_another_config_lib_v3": ">=3.8.2"
   }
 }

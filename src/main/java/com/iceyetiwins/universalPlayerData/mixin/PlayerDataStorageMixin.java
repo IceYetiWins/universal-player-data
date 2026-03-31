@@ -1,5 +1,6 @@
 package com.iceyetiwins.universalPlayerData.mixin;
 
+import com.iceyetiwins.universalPlayerData.ModConfig;
 import com.iceyetiwins.universalPlayerData.UniversalPlayerData;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.CompoundTag;
@@ -54,7 +55,7 @@ public class PlayerDataStorageMixin {
         }
     }
 
-    //load universal player data instead of world player data
+    //load universal player data instead of world player data unless universal player data doesn't exist
     @Inject(at = @At("HEAD"), method = "load(Lnet/minecraft/server/players/NameAndId;Ljava/lang/String;)Ljava/util/Optional;", cancellable = true)
     private void onLoad (NameAndId nameAndId, String suffix, CallbackInfoReturnable<Optional<CompoundTag>> cir) {
         File worldPlayerData = new File(playerDir, nameAndId.id() + suffix);
@@ -65,7 +66,7 @@ public class PlayerDataStorageMixin {
                     CompoundTag worldNbt = NbtIo.readCompressed(worldPlayerData.toPath(), NbtAccounter.unlimitedHeap());
                     CompoundTag universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtAccounter.unlimitedHeap());
 
-                    for (String tag : UniversalPlayerData.NBT_TAGS) {
+                    for (String tag : ModConfig.HANDLER.instance().NbtTagExclusions) {
                         if (worldNbt.contains(tag)) {
                             universalNbt.remove(tag);
                             universalNbt.put(tag, worldNbt.get(tag));
@@ -78,7 +79,7 @@ public class PlayerDataStorageMixin {
                 } else if (universalPlayerData.exists() && universalPlayerData.isFile()) {
                     CompoundTag universalNbt = NbtIo.readCompressed(universalPlayerData.toPath(), NbtAccounter.unlimitedHeap());
 
-                    for (String tag : UniversalPlayerData.NBT_TAGS) {
+                    for (String tag : ModConfig.HANDLER.instance().NbtTagExclusions) {
                         universalNbt.remove(tag);
                     }
 

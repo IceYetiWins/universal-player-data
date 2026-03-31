@@ -1,5 +1,6 @@
 package com.iceyetiwins.universalPlayerData.mixin;
 
+import com.iceyetiwins.universalPlayerData.ModConfig;
 import com.iceyetiwins.universalPlayerData.UniversalPlayerData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.players.NameAndId;
@@ -35,6 +36,9 @@ public class PlayerListMixin {
             )
     )
     private void removeCoordinatesFromLog(org.slf4j.Logger logger, String message, Object[] args) {
-        UniversalPlayerData.LOGGER.info("{}[{}] logged in with entity id {}", args[0], args[1], args[2]);
+        if (ModConfig.HANDLER.instance().startAtSpawn)
+            UniversalPlayerData.LOGGER.info("{}[{}] logged in with entity id {}", args[0], args[1], args[2]);
+        else
+            UniversalPlayerData.LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", args[0], args[1], args[2], args[3], args[4], args[5]);
     }
 }
