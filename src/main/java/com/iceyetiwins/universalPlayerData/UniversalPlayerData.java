@@ -2,6 +2,7 @@ package com.iceyetiwins.universalPlayerData;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.portal.TeleportTransition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,5 +22,7 @@ public class UniversalPlayerData implements ModInitializer {
                 LOGGER.info("{} logged in at ({}, {}, {})", player.getName().getString(), player.getX(), player.getY(), player.getZ());
             }
         });
+
+        ServerPlayerEvents.LEAVE.register(LivingEntity::stopRiding); //dismount when leaving world so that vehicle isn't an issue between worlds
     }
 }

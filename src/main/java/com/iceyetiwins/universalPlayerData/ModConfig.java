@@ -21,5 +21,5 @@ public class ModConfig {
     public boolean startAtSpawn = true;
 
     @SerialEntry
-    public List<String> NbtTagExclusions = List.of("abilities", "LastDeathLocation", "playerGameType", "respawn", "warden_spawn_tracker");
+    public List<String> NbtTagExclusions = List.of("abilities", "LastDeathLocation", "playerGameType", "respawn", "RootVehicle", "warden_spawn_tracker");
 }
