@@ -31,7 +31,7 @@ public class ModMenuIntegration implements ModMenuApi {
                         .option(ListOption.<String>createBuilder()
                                 .name(Component.literal("NBT Tag Exclusions"))
                                 .description(OptionDescription.of(Component.literal("Which player data should not be shared between all worlds. For example playerGameType so that some worlds can be survival while others are creative. \n\nThese can be found using NBTExplorer.")))
-                                .binding(List.of("abilities", "LastDeathLocation", "playerGameType", "respawn", "warden_spawn_tracker"), () -> ModConfig.HANDLER.instance().NbtTagExclusions, newVal -> ModConfig.HANDLER.instance().NbtTagExclusions = newVal)
+                                .binding(List.of("abilities", "LastDeathLocation", "playerGameType", "respawn", "RootVehicle", "warden_spawn_tracker"), () -> ModConfig.HANDLER.instance().NbtTagExclusions, newVal -> ModConfig.HANDLER.instance().NbtTagExclusions = newVal)
                                 .controller(StringControllerBuilder::create) // usual controllers, passed to every entry
                                 .initial("") // when adding a new entry to the list, this is the initial value it has
                                 .build())
